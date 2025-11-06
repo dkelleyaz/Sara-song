@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sara — Dave Kelley</title>
+  <style>
+    :root {
+      --bg-overlay: rgba(0,0,0,0.45);
+      --text: #ffffff;
+      --accent: #f4e3c1;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      color: var(--text);
+      background: var(--bg-overlay) url('./assets/bg.jpg') center/cover no-repeat fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .scrim {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.55));
+      pointer-events: none;
+    }
+    .card {
+      position: relative;
+      z-index: 2;
+      backdrop-filter: blur(2px);
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 24px 22px;
+      width: min(92vw, 720px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    .dedication {
+      margin: 0 0 18px;
+      color: var(--accent);
+      font-style: italic;
+      opacity: 0.95;
+    }
+    audio {
+      width: 100%;
+      outline: none;
+      accent-color: var(--accent);
+    }
+    footer {
+      margin-top: 12px;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="scrim" aria-hidden="true"></div>
+  <main class="card" role="main">
+    <h1>“Sara” — Written &amp; Performed by Dave Kelley (2025)</h1>
+    <p class="dedication">For Sara — Ten Years, Every Note for You.</p>
+    <audio controls>
+      <source src="Sara.mp3" type="audio/mpeg" />
+      Your browser doesn’t support the audio element.
+    </audio>
+    <footer>Tip: Some phones require a quick tap on ▶️ to start audio.</footer>
+  </main>
+</body>
+</html>
