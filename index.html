@@ -9,7 +9,8 @@
 :root {
   --accent: #f4e3c1;
   --text: #ffffff;
-  --bg-overlay: rgba(0,0,0,0.45);
+  --bg-dim: rgba(0,0,0,0.25);
+  --bg-dim-lyrics: rgba(0,0,0,0.55);
 }
 
 html, body {
@@ -21,20 +22,20 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, system-ui, "Helvetica Neue", Arial, sans-serif;
   color: var(--text);
   background:
-    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+    linear-gradient(var(--bg-dim), var(--bg-dim)),
     url('./assets/bg.jpg') center / cover no-repeat fixed;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding-top: 36px;
   box-sizing: border-box;
+  transition: background 0.4s ease;
 }
 
-.scrim {
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.55));
-  pointer-events: none;
+body.lyrics-open {
+  background:
+    linear-gradient(var(--bg-dim-lyrics), var(--bg-dim-lyrics)),
+    url('./assets/bg.jpg') center / cover no-repeat fixed;
 }
 
 /* slim card */
@@ -91,6 +92,7 @@ h1 {
   font-size: 14px;
   line-height: 1.4;
   opacity: 0.55;
+  transition: opacity 0.3s ease;
 }
 
 .lyrics-line.active {
@@ -104,25 +106,33 @@ h1 {
   bottom: 0;
   left: 0;
   right: 0;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
   backdrop-filter: blur(10px);
   background: rgba(0,0,0,0.35);
   border-top: 1px solid rgba(255,255,255,0.12);
-  padding: 10px 14px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   z-index: 50;
 }
 
 .play-btn {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   border: 1px solid rgba(255,255,255,0.35);
-  background: rgba(255,255,255,0.15);
-  color: var(--accent);
-  font-size: 15px;
+  background: rgba(0,0,0,0.8);
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-btn.paused {
+  color: #000;
 }
 
 .song-title {
@@ -131,24 +141,32 @@ h1 {
   opacity: 0.9;
 }
 
+.time {
+  font-size: 12px;
+  opacity: 0.7;
+  min-width: 38px;
+  text-align: right;
+}
+
 .progress {
   flex: 2;
   height: 4px;
   background: rgba(255,255,255,0.25);
   border-radius: 2px;
+  position: relative;
+  touch-action: none;
 }
 
 .progress-fill {
   height: 100%;
   background: var(--accent);
   width: 0%;
+  border-radius: 2px;
 }
 </style>
 </head>
 
 <body>
-<div class="scrim"></div>
-
 <main class="card">
   <h1>“Sara” — Dave Kelley</h1>
   <div class="dedication">For Sara — Ten Years, Every Note for You.</div>
@@ -160,9 +178,11 @@ h1 {
 <div class="playbar">
   <button id="playBtn" class="play-btn">▶</button>
   <div class="song-title">Sara — Dave Kelley</div>
-  <div class="progress">
+  <div id="currentTime" class="time">0:00</div>
+  <div id="progress" class="progress">
     <div id="progressFill" class="progress-fill"></div>
   </div>
+  <div id="duration" class="time">0:00</div>
 </div>
 
 <audio id="audio">
@@ -200,9 +220,12 @@ const lyricsData = [
 ];
 
 const audio = document.getElementById("audio");
-const lyricsBox = document.getElementById("lyrics");
 const playBtn = document.getElementById("playBtn");
+const progress = document.getElementById("progress");
 const progressFill = document.getElementById("progressFill");
+const currentTimeEl = document.getElementById("currentTime");
+const durationEl = document.getElementById("duration");
+const lyricsBox = document.getElementById("lyrics");
 
 lyricsData.forEach(([_, text]) => {
   const d = document.createElement("div");
@@ -211,18 +234,43 @@ lyricsData.forEach(([_, text]) => {
   lyricsBox.appendChild(d);
 });
 
+audio.onloadedmetadata = () => {
+  durationEl.textContent = formatTime(audio.duration);
+};
+
 playBtn.onclick = () => {
   if (audio.paused) {
     audio.play();
-    playBtn.textContent = "⏸";
+    playBtn.textContent = "❚❚";
   } else {
     audio.pause();
     playBtn.textContent = "▶";
   }
 };
 
+let isScrubbing = false;
+
+progress.addEventListener("pointerdown", e => {
+  isScrubbing = true;
+  progress.setPointerCapture(e.pointerId);
+});
+
+progress.addEventListener("pointermove", e => {
+  if (!isScrubbing) return;
+  const rect = progress.getBoundingClientRect();
+  const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+  audio.currentTime = pct * audio.duration;
+});
+
+progress.addEventListener("pointerup", e => {
+  isScrubbing = false;
+  progress.releasePointerCapture(e.pointerId);
+});
+
 audio.ontimeupdate = () => {
+  currentTimeEl.textContent = formatTime(audio.currentTime);
   progressFill.style.width = (audio.currentTime / audio.duration) * 100 + "%";
+
   const t = Math.max(0, audio.currentTime - LYRIC_OFFSET);
   const lines = document.querySelectorAll(".lyrics-line");
 
@@ -241,6 +289,13 @@ audio.ontimeupdate = () => {
 
 function toggleLyrics() {
   lyricsBox.classList.toggle("open");
+  document.body.classList.toggle("lyrics-open");
+}
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
 }
 </script>
 </body>
