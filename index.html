@@ -29,8 +29,7 @@ body {
   align-items: flex-start;
   padding-top: 36px;
   box-sizing: border-box;
-  transition:
-    background 1.1s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: background 1.1s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 body.lyrics-open {
@@ -39,8 +38,9 @@ body.lyrics-open {
     url('./assets/bg.jpg') center / cover no-repeat fixed;
 }
 
-/* card */
+/* Card */
 .card {
+  z-index: 10;
   backdrop-filter: blur(4px);
   background: rgba(0,0,0,0.30);
   border: 1px solid rgba(255,255,255,0.14);
@@ -75,7 +75,7 @@ h1 {
   cursor: pointer;
 }
 
-/* lyrics panel */
+/* Lyrics panel */
 .lyrics-container {
   margin-top: 12px;
   max-height: 45vh;
@@ -100,7 +100,6 @@ h1 {
   font-size: 14px;
   line-height: 1.4;
   opacity: 0.45;
-  transform: scale(0.995);
   transition:
     opacity 0.4s ease,
     transform 0.4s ease,
@@ -111,18 +110,18 @@ h1 {
 .lyrics-line.active {
   opacity: 1;
   color: var(--accent);
-  transform: scale(1.02);
   text-shadow:
     0 0 6px rgba(244,227,193,0.35),
     0 0 14px rgba(244,227,193,0.15);
 }
 
-/* play bar */
+/* Play bar */
 .playbar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
+  z-index: 20;
   padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
   backdrop-filter: blur(10px);
   background: rgba(0,0,0,0.35);
@@ -200,6 +199,152 @@ h1 {
 </head>
 
 <body>
-<!-- HTML + JS unchanged from previous version -->
+
+<main class="card">
+  <h1>“Sara” — Dave Kelley</h1>
+  <div class="dedication">For Sara — Ten Years, Every Note for You.</div>
+  <button class="lyrics-toggle" onclick="toggleLyrics()">Show Lyrics</button>
+  <div id="lyrics" class="lyrics-container"></div>
+</main>
+
+<div class="playbar">
+  <button id="playBtn" class="play-btn">▶</button>
+  <div class="song-title">Sara — Dave Kelley</div>
+  <div id="currentTime" class="time">0:00</div>
+
+  <div id="progressWrap" class="progress-wrap">
+    <div id="progress" class="progress">
+      <div id="progressFill" class="progress-fill"></div>
+    </div>
+    <div id="thumb" class="thumb"></div>
+  </div>
+
+  <div id="duration" class="time">0:00</div>
+</div>
+
+<audio id="audio">
+  <source src="Sara.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+/* --- JS unchanged from previous working version --- */
+const LYRIC_OFFSET = 12.5;
+
+const lyricsData = [
+  [0,"God placed, us side by side that day"],
+  [6,"The same team at work where hearts found their way"],
+  [13,"Friendship sparked a love soon grew"],
+  [18,"God’s quiet plan was leading to you"],
+  [25,"Sara my heart still stands in awe"],
+  [31,"God’s grace has carried us through it all"],
+  [37,"Your smile, your eyes, they calm me too"],
+  [44,"God knew my best, would start with you"],
+  [56,"Love Bryce and Gavin with all your heart"],
+  [63,"Through faith and care our family’s grown"],
+  [69,"So strong, so wise, so steady and true"],
+  [75,"God’s love shines brightly through you"],
+  [82,"Sara my heart still stands in awe"],
+  [88,"God’s grace has carried us through it all"],
+  [94,"Your smile, your eyes, they calm me too"],
+  [100,"God knew my best, would start with you"],
+  [113,"From Mexico waves to the oceans hue"],
+  [119,"Diamondback games and laughter too"],
+  [125,"Working from home, still side by side"],
+  [131,"Together all these years, our hearts abide"],
+  [142,"Sara my best friend, my gift, my truth"],
+  [149,"The best human I ever knew"],
+  [155,"Everyday I thank god anew"],
+  [161,"For this life, he wrote, with you"]
+];
+
+const audio = document.getElementById("audio");
+const playBtn = document.getElementById("playBtn");
+const progress = document.getElementById("progress");
+const progressFill = document.getElementById("progressFill");
+const thumb = document.getElementById("thumb");
+const progressWrap = document.getElementById("progressWrap");
+const currentTimeEl = document.getElementById("currentTime");
+const durationEl = document.getElementById("duration");
+const lyricsBox = document.getElementById("lyrics");
+
+lyricsData.forEach(([_, text]) => {
+  const d = document.createElement("div");
+  d.className = "lyrics-line";
+  d.textContent = text;
+  lyricsBox.appendChild(d);
+});
+
+audio.onloadedmetadata = () => {
+  durationEl.textContent = formatTime(audio.duration);
+};
+
+playBtn.onclick = () => {
+  if (audio.paused) {
+    audio.play();
+    playBtn.textContent = "❚❚";
+  } else {
+    audio.pause();
+    playBtn.textContent = "▶";
+  }
+};
+
+let isScrubbing = false;
+
+progressWrap.addEventListener("pointerdown", e => {
+  isScrubbing = true;
+  progressWrap.setPointerCapture(e.pointerId);
+  scrub(e);
+});
+
+progressWrap.addEventListener("pointermove", e => {
+  if (!isScrubbing) return;
+  scrub(e);
+});
+
+progressWrap.addEventListener("pointerup", e => {
+  isScrubbing = false;
+  progressWrap.releasePointerCapture(e.pointerId);
+});
+
+function scrub(e) {
+  const rect = progress.getBoundingClientRect();
+  const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+  audio.currentTime = pct * audio.duration;
+}
+
+audio.ontimeupdate = () => {
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+  const pct = audio.currentTime / audio.duration;
+  progressFill.style.width = pct * 100 + "%";
+  thumb.style.left = pct * 100 + "%";
+
+  const t = Math.max(0, audio.currentTime - LYRIC_OFFSET);
+  const lines = document.querySelectorAll(".lyrics-line");
+
+  for (let i = 0; i < lyricsData.length; i++) {
+    const next = lyricsData[i + 1]?.[0] ?? Infinity;
+    if (t >= lyricsData[i][0] && t < next) {
+      lines.forEach(l => l.classList.remove("active"));
+      lines[i].classList.add("active");
+      if (lyricsBox.classList.contains("open")) {
+        lines[i].scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+      break;
+    }
+  }
+};
+
+function toggleLyrics() {
+  lyricsBox.classList.toggle("open");
+  document.body.classList.toggle("lyrics-open");
+}
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
+</script>
+
 </body>
 </html>
