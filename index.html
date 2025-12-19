@@ -1,263 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sara — Dave Kelley</title>
-  <style>
-    :root {
-      --accent: #f4e3c1;
-      --text: #ffffff;
-      --bg-overlay: rgba(0,0,0,0.45);
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sara — Dave Kelley</title>
 
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
+<style>
+:root {
+  --accent: #f4e3c1;
+  --text: #ffffff;
+  --bg-overlay: rgba(0,0,0,0.45);
+}
 
-    body {
-      font-family: Georgia, 'Times New Roman', serif;
-      color: var(--text);
-      background: var(--bg-overlay) url('./assets/bg.jpg') center/cover no-repeat fixed;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding-top: 40px;
-      box-sizing: border-box;
-    }
+html, body {
+  height: 100%;
+  margin: 0;
+}
 
-    /* Fade-in animation */
-    .fade-in {
-      opacity: 0;
-      animation: fadeIn 0.9s ease forwards;
-    }
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg-overlay) url('./assets/bg.jpg') center/cover no-repeat fixed;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 36px;
+  box-sizing: border-box;
+}
 
-    .scrim {
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.55));
-      pointer-events: none;
-    }
+/* gentle parallax */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: inherit;
+  transform: translateY(var(--parallax, 0px));
+  z-index: -1;
+}
 
-    /* Slim Card */
-    .card {
-      position: relative;
-      z-index: 2;
-      backdrop-filter: blur(3px);
-      background: rgba(0,0,0,0.30);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 12px;
-      padding: 14px 20px;
-      width: min(92vw, 480px);
-      text-align: center;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-    }
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.55));
+  pointer-events: none;
+}
 
-    h1 {
-      margin: 0 0 6px;
-      font-size: 20px;
-      font-weight: 600;
-    }
+/* slim card */
+.card {
+  z-index: 2;
+  backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.30);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 14px;
+  padding: 14px 18px;
+  width: min(92vw, 460px);
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
 
-    .dedication {
-      margin: 0 0 10px;
-      color: var(--accent);
-      font-style: italic;
-      opacity: 0.9;
-      font-size: 14px;
-    }
+h1 {
+  margin: 0 0 6px;
+  font-size: 19px;
+  font-weight: 600;
+}
 
-    /* Lyrics toggle */
-    .lyrics-toggle {
-      margin-top: 10px;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.25);
-      padding: 6px 12px;
-      color: var(--accent);
-      font-size: 13px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .lyrics-toggle:hover {
-      background: rgba(255,255,255,0.25);
-    }
+.dedication {
+  font-size: 14px;
+  color: var(--accent);
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
 
-    .lyrics-container {
-      max-height: 0;
-      overflow: hidden;
-      opacity: 0;
-      transition: all 0.4s ease;
-      margin-top: 10px;
-    }
-    .lyrics-container.open {
-      max-height: 450px;
-      opacity: 1;
-    }
+.lyrics-toggle {
+  margin-top: 8px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  padding: 6px 12px;
+  color: var(--accent);
+  font-size: 13px;
+  border-radius: 8px;
+  cursor: pointer;
+}
 
-    .lyrics {
-      white-space: pre-wrap;
-      font-size: 14px;
-      line-height: 1.4;
-      padding: 10px 0;
-    }
+.lyrics-container {
+  margin-top: 10px;
+  max-height: 45vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: none;
+}
 
-    /* Floating Apple Music style play bar */
-    .playbar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      backdrop-filter: blur(8px);
-      background: rgba(0,0,0,0.35);
-      border-top: 1px solid rgba(255,255,255,0.12);
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      z-index: 50;
-    }
+.lyrics-container.open {
+  display: block;
+  opacity: 1;
+}
 
-    .play-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.35);
-      background: rgba(255,255,255,0.15);
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .play-btn:hover {
-      background: rgba(255,255,255,0.25);
-    }
+.lyrics-line {
+  padding: 6px 0;
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0.55;
+  transition: opacity 0.25s;
+}
 
-    .song-title {
-      flex: 1;
-      color: var(--text);
-      font-size: 14px;
-      opacity: 0.9;
-    }
+.lyrics-line.active {
+  opacity: 1;
+  color: var(--accent);
+}
 
-    .progress {
-      flex: 2;
-      height: 4px;
-      background: rgba(255,255,255,0.25);
-      border-radius: 2px;
-      cursor: pointer;
-      position: relative;
-    }
-    .progress-fill {
-      height: 100%;
-      background: var(--accent);
-      width: 0%;
-      border-radius: 2px;
-      transition: width 0.15s linear;
-    }
-  </style>
+/* floating play bar */
+.playbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  backdrop-filter: blur(10px);
+  background: rgba(0,0,0,0.35);
+  border-top: 1px solid rgba(255,255,255,0.12);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 50;
+}
+
+.play-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.15);
+  color: var(--accent);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.song-title {
+  flex: 1;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.progress {
+  flex: 2;
+  height: 4px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 2px;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  width: 0%;
+  border-radius: 2px;
+}
+</style>
 </head>
 
 <body>
-  <div class="scrim" aria-hidden="true"></div>
+<div class="scrim"></div>
 
-  <!-- Slim Title Card -->
-  <main class="card fade-in">
-    <h1>“Sara” — Written &amp; Performed by Dave Kelley</h1>
-    <p class="dedication">For Sara — Ten Years, Every Note for You.</p>
+<main class="card">
+  <h1>“Sara” — Dave Kelley</h1>
+  <div class="dedication">For Sara — Ten Years, Every Note for You.</div>
 
-    <button class="lyrics-toggle" onclick="toggleLyrics()">Show Lyrics</button>
+  <button class="lyrics-toggle" onclick="toggleLyrics()">Show Lyrics</button>
 
-    <div id="lyricsBox" class="lyrics-container">
-      <p class="lyrics">
-God placed, us side by side that day
-The same team at work where hearts found their way
-Friendship sparked a love soon grew
-God’s quiet plan was leading to you
+  <div id="lyrics" class="lyrics-container"></div>
+</main>
 
-Sara my heart still stands in awe
-God’s grace has carried us through it all
-Your smile, your eyes, they calm me too
-God knew my best, would start with you
-
-Love Bryce and Gavin with all your heart
-Through faith and care our family’s grown
-So strong, so wise, so steady and true
-God’s love shines brightly through you
-
-Sara my heart still stands in awe
-God’s grace has carried us through it all
-Your smile, your eyes, they calm me too
-God knew my best, would start with you
-
-From Mexico waves to the oceans hue
-Diamondback games and laughter too
-Working from home, still side by side
-Together all these years, our hearts abide
-
-Sara my best friend, my gift, my truth
-The best human I ever knew
-Everyday I thank god anew 
-For this life, he wrote, with you
-
-
-      </p>
-    </div>
-  </main>
-
-  <!-- Floating Apple Music Style Play Bar -->
-  <div class="playbar">
-    <button id="playPauseBtn" class="play-btn">▶</button>
-    <div class="song-title">Sara — Dave Kelley</div>
-    <div class="progress" onclick="seek(event)">
-      <div id="progressFill" class="progress-fill"></div>
-    </div>
+<div class="playbar">
+  <button id="playBtn" class="play-btn">▶</button>
+  <div class="song-title">Sara — Dave Kelley</div>
+  <div class="progress">
+    <div id="progressFill" class="progress-fill"></div>
   </div>
+</div>
 
-  <!-- Hidden audio element -->
-  <audio id="audioPlayer">
-    <source src="Sara.mp3" type="audio/mpeg" />
-  </audio>
+<audio id="audio">
+  <source src="Sara.mp3" type="audio/mpeg">
+</audio>
 
-  <script>
-    const audio = document.getElementById("audioPlayer");
-    const playBtn = document.getElementById("playPauseBtn");
-    const progressFill = document.getElementById("progressFill");
+<script>
+const lyricsData = [
+  [0, "God placed, us side by side that day"],
+  [6, "The same team at work where hearts found their way"],
+  [13, "Friendship sparked a love soon grew"],
+  [18, "God’s quiet plan was leading to you"],
+  [25, "Sara my heart still stands in awe"],
+  [31, "God’s grace has carried us through it all"],
+  [37, "Your smile, your eyes, they calm me too"],
+  [44, "God knew my best, would start with you"],
+  [56, "Love Bryce and Gavin with all your heart"],
+  [63, "Through faith and care our family’s grown"],
+  [69, "So strong, so wise, so steady and true"],
+  [75, "God’s love shines brightly through you"],
+  [82, "Sara my heart still stands in awe"],
+  [88, "God’s grace has carried us through it all"],
+  [94, "Your smile, your eyes, they calm me too"],
+  [100, "God knew my best, would start with you"],
+  [113, "From Mexico waves to the oceans hue"],
+  [119, "Diamondback games and laughter too"],
+  [125, "Working from home, still side by side"],
+  [131, "Together all these years, our hearts abide"],
+  [142, "Sara my best friend, my gift, my truth"],
+  [149, "The best human I ever knew"],
+  [155, "Everyday I thank god anew"],
+  [161, "For this life, he wrote, with you"]
+];
 
-    playBtn.onclick = () => {
-      if (audio.paused) {
-        audio.play();
-        playBtn.textContent = "⏸";
-      } else {
-        audio.pause();
-        playBtn.textContent = "▶";
-      }
-    };
+const audio = document.getElementById("audio");
+const lyricsBox = document.getElementById("lyrics");
+const playBtn = document.getElementById("playBtn");
+const progressFill = document.getElementById("progressFill");
 
-    audio.ontimeupdate = () => {
-      progressFill.style.width = (audio.currentTime / audio.duration) * 100 + "%";
-    };
+lyricsData.forEach(([, text], i) => {
+  const div = document.createElement("div");
+  div.className = "lyrics-line";
+  div.textContent = text;
+  lyricsBox.appendChild(div);
+});
 
-    function seek(e) {
-      const bar = e.currentTarget;
-      const percent = e.offsetX / bar.offsetWidth;
-      audio.currentTime = percent * audio.duration;
+playBtn.onclick = () => {
+  if (audio.paused) {
+    audio.play();
+    playBtn.textContent = "⏸";
+  } else {
+    audio.pause();
+    playBtn.textContent = "▶";
+  }
+};
+
+audio.ontimeupdate = () => {
+  const t = audio.currentTime;
+  progressFill.style.width = (t / audio.duration) * 100 + "%";
+
+  for (let i = 0; i < lyricsData.length; i++) {
+    const [time] = lyricsData[i];
+    const next = lyricsData[i + 1]?.[0] ?? Infinity;
+
+    if (t >= time && t < next) {
+      const lines = document.querySelectorAll(".lyrics-line");
+      lines.forEach(l => l.classList.remove("active"));
+      lines[i].classList.add("active");
+      lines[i].scrollIntoView({ block: "center", behavior: "smooth" });
+      break;
     }
+  }
+};
 
-    function toggleLyrics() {
-      const box = document.getElementById('lyricsBox');
-      const btn = document.querySelector('.lyrics-toggle');
-      const open = box.classList.toggle('open');
-      btn.textContent = open ? "Hide Lyrics" : "Show Lyrics";
-    }
-  </script>
-
+function toggleLyrics() {
+  lyricsBox.classList.toggle("open");
+  lyricsBox.style.display = lyricsBox.classList.contains("open") ? "block" : "none";
+}
+</script>
 </body>
 </html>
