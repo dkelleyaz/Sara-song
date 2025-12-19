@@ -19,15 +19,29 @@
       color: var(--text);
       background: var(--bg-overlay) url('./assets/bg.jpg') center/cover no-repeat fixed;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: flex-start;
+      padding-top: 40px;
+      box-sizing: border-box;
     }
+
+    /* Fade-in animation */
+    .fade-in {
+      opacity: 0;
+      animation: fadeIn 0.8s ease forwards;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
     .scrim {
       position: fixed;
       inset: 0;
       background: linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.55));
       pointer-events: none;
     }
+
+    /* Smaller card */
     .card {
       position: relative;
       z-index: 2;
@@ -35,44 +49,107 @@
       background: rgba(0,0,0,0.35);
       border: 1px solid rgba(255,255,255,0.15);
       border-radius: 14px;
-      padding: 24px 22px;
-      width: min(92vw, 720px);
+      padding: 18px 18px;
+      width: min(92vw, 600px);
       box-shadow: 0 12px 40px rgba(0,0,0,0.4);
       text-align: center;
     }
+
     h1 {
       margin: 0 0 10px;
       font-weight: 600;
-      letter-spacing: 0.2px;
     }
+
     .dedication {
-      margin: 0 0 18px;
+      margin: 0 0 16px;
       color: var(--accent);
       font-style: italic;
-      opacity: 0.95;
     }
+
     audio {
       width: 100%;
-      outline: none;
+      margin-bottom: 12px;
       accent-color: var(--accent);
     }
+
     footer {
-      margin-top: 12px;
+      margin-top: 10px;
       font-size: 12px;
       opacity: 0.7;
+    }
+
+    /* Lyrics toggle */
+    .lyrics-toggle {
+      margin-top: 14px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 8px 14px;
+      color: var(--accent);
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .lyrics-toggle:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    .lyrics-container {
+      margin-top: 14px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.4s ease;
+    }
+
+    .lyrics-container.open {
+      max-height: 500px; /* enough to show full lyrics */
+      opacity: 1;
+    }
+
+    .lyrics {
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.4;
+      margin: 0;
+      padding: 10px 0;
+      color: var(--text);
     }
   </style>
 </head>
 <body>
   <div class="scrim" aria-hidden="true"></div>
-  <main class="card" role="main">
+
+  <main class="card fade-in" role="main">
     <h1>“Sara” — Written &amp; Performed by Dave Kelley (2025)</h1>
     <p class="dedication">For Sara — Ten Years, Every Note for You.</p>
+
     <audio controls>
       <source src="Sara.mp3" type="audio/mpeg" />
       Your browser doesn’t support the audio element.
     </audio>
+
+    <button class="lyrics-toggle" onclick="toggleLyrics()">Show Lyrics</button>
+
+    <div id="lyricsBox" class="lyrics-container">
+      <p class="lyrics">
+        <!-- INSERT YOUR LYRICS HERE -->
+        Together all these years…
+        (Paste the full lyrics you want here)
+      </p>
+    </div>
+
     <footer>Tip: Some phones require a quick tap on ▶️ to start audio.</footer>
   </main>
+
+  <script>
+    function toggleLyrics() {
+      const box = document.getElementById('lyricsBox');
+      const btn = document.querySelector('.lyrics-toggle');
+      const open = box.classList.toggle('open');
+      btn.textContent = open ? "Hide Lyrics" : "Show Lyrics";
+    }
+  </script>
+
 </body>
 </html>
