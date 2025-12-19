@@ -28,7 +28,7 @@ body {
   box-sizing: border-box;
 }
 
-/* gentle parallax */
+/* subtle parallax */
 body::before {
   content: "";
   position: fixed;
@@ -168,7 +168,6 @@ h1 {
   <div class="dedication">For Sara — Ten Years, Every Note for You.</div>
 
   <button class="lyrics-toggle" onclick="toggleLyrics()">Show Lyrics</button>
-
   <div id="lyrics" class="lyrics-container"></div>
 </main>
 
@@ -185,6 +184,9 @@ h1 {
 </audio>
 
 <script>
+/* 🔧 GLOBAL LYRIC OFFSET (intro before vocals) */
+const LYRIC_OFFSET = 12.5; // seconds
+
 const lyricsData = [
   [0, "God placed, us side by side that day"],
   [6, "The same team at work where hearts found their way"],
@@ -217,7 +219,7 @@ const lyricsBox = document.getElementById("lyrics");
 const playBtn = document.getElementById("playBtn");
 const progressFill = document.getElementById("progressFill");
 
-lyricsData.forEach(([, text], i) => {
+lyricsData.forEach(([, text]) => {
   const div = document.createElement("div");
   div.className = "lyrics-line";
   div.textContent = text;
@@ -235,27 +237,14 @@ playBtn.onclick = () => {
 };
 
 audio.ontimeupdate = () => {
-  const t = audio.currentTime;
-  progressFill.style.width = (t / audio.duration) * 100 + "%";
+  progressFill.style.width = (audio.currentTime / audio.duration) * 100 + "%";
+
+  const t = Math.max(0, audio.currentTime - LYRIC_OFFSET);
+  const lines = document.querySelectorAll(".lyrics-line");
 
   for (let i = 0; i < lyricsData.length; i++) {
     const [time] = lyricsData[i];
     const next = lyricsData[i + 1]?.[0] ?? Infinity;
 
     if (t >= time && t < next) {
-      const lines = document.querySelectorAll(".lyrics-line");
-      lines.forEach(l => l.classList.remove("active"));
-      lines[i].classList.add("active");
-      lines[i].scrollIntoView({ block: "center", behavior: "smooth" });
-      break;
-    }
-  }
-};
-
-function toggleLyrics() {
-  lyricsBox.classList.toggle("open");
-  lyricsBox.style.display = lyricsBox.classList.contains("open") ? "block" : "none";
-}
-</script>
-</body>
-</html>
+     
