@@ -9,8 +9,8 @@
 :root {
   --accent: #f4e3c1;
   --text: #ffffff;
-  --bg-dim: rgba(0,0,0,0.25);
-  --bg-dim-lyrics: rgba(0,0,0,0.55);
+  --bg-dim: rgba(0,0,0,0.22);
+  --bg-dim-lyrics: rgba(0,0,0,0.62);
 }
 
 html, body {
@@ -29,7 +29,8 @@ body {
   align-items: flex-start;
   padding-top: 36px;
   box-sizing: border-box;
-  transition: background 0.4s ease;
+  transition:
+    background 0.75s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 body.lyrics-open {
@@ -50,6 +51,7 @@ body.lyrics-open {
   box-shadow: 0 12px 40px rgba(0,0,0,0.4);
 }
 
+/* title */
 h1 {
   margin: 0 0 6px;
   font-size: 19px;
@@ -63,6 +65,7 @@ h1 {
   margin-bottom: 8px;
 }
 
+/* lyrics toggle */
 .lyrics-toggle {
   margin-top: 8px;
   background: rgba(255,255,255,0.15);
@@ -74,17 +77,24 @@ h1 {
   cursor: pointer;
 }
 
-/* lyrics */
+/* lyrics panel */
 .lyrics-container {
-  margin-top: 10px;
+  margin-top: 12px;
   max-height: 45vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   display: none;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.55s cubic-bezier(0.4, 0.0, 0.2, 1),
+    transform 0.55s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .lyrics-container.open {
   display: block;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .lyrics-line {
@@ -94,10 +104,10 @@ h1 {
   opacity: 0.45;
   transform: scale(0.995);
   transition:
-    opacity 0.35s ease,
-    transform 0.35s ease,
-    text-shadow 0.35s ease,
-    color 0.35s ease;
+    opacity 0.4s ease,
+    transform 0.4s ease,
+    text-shadow 0.4s ease,
+    color 0.4s ease;
 }
 
 .lyrics-line.active {
@@ -124,6 +134,7 @@ h1 {
   gap: 10px;
 }
 
+/* play / pause */
 .play-btn {
   width: 34px;
   height: 34px;
@@ -139,6 +150,7 @@ h1 {
   justify-content: center;
 }
 
+/* progress */
 .song-title {
   flex: 1;
   font-size: 14px;
@@ -152,8 +164,16 @@ h1 {
   text-align: right;
 }
 
-.progress {
+.progress-wrap {
   flex: 2;
+  position: relative;
+  height: 28px; /* larger touch target */
+  display: flex;
+  align-items: center;
+}
+
+.progress {
+  width: 100%;
   height: 4px;
   background: rgba(255,255,255,0.25);
   border-radius: 2px;
@@ -166,6 +186,20 @@ h1 {
   background: var(--accent);
   width: 0%;
   border-radius: 2px;
+}
+
+/* draggable thumb */
+.thumb {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(0,0,0,0.4);
+  pointer-events: none;
 }
 </style>
 </head>
@@ -183,9 +217,14 @@ h1 {
   <button id="playBtn" class="play-btn">▶</button>
   <div class="song-title">Sara — Dave Kelley</div>
   <div id="currentTime" class="time">0:00</div>
-  <div id="progress" class="progress">
-    <div id="progressFill" class="progress-fill"></div>
+
+  <div id="progressWrap" class="progress-wrap">
+    <div id="progress" class="progress">
+      <div id="progressFill" class="progress-fill"></div>
+    </div>
+    <div id="thumb" class="thumb"></div>
   </div>
+
   <div id="duration" class="time">0:00</div>
 </div>
 
@@ -227,6 +266,8 @@ const audio = document.getElementById("audio");
 const playBtn = document.getElementById("playBtn");
 const progress = document.getElementById("progress");
 const progressFill = document.getElementById("progressFill");
+const thumb = document.getElementById("thumb");
+const progressWrap = document.getElementById("progressWrap");
 const currentTimeEl = document.getElementById("currentTime");
 const durationEl = document.getElementById("duration");
 const lyricsBox = document.getElementById("lyrics");
@@ -254,26 +295,33 @@ playBtn.onclick = () => {
 
 let isScrubbing = false;
 
-progress.addEventListener("pointerdown", e => {
+progressWrap.addEventListener("pointerdown", e => {
   isScrubbing = true;
-  progress.setPointerCapture(e.pointerId);
+  progressWrap.setPointerCapture(e.pointerId);
+  scrub(e);
 });
 
-progress.addEventListener("pointermove", e => {
+progressWrap.addEventListener("pointermove", e => {
   if (!isScrubbing) return;
+  scrub(e);
+});
+
+progressWrap.addEventListener("pointerup", e => {
+  isScrubbing = false;
+  progressWrap.releasePointerCapture(e.pointerId);
+});
+
+function scrub(e) {
   const rect = progress.getBoundingClientRect();
   const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
   audio.currentTime = pct * audio.duration;
-});
-
-progress.addEventListener("pointerup", e => {
-  isScrubbing = false;
-  progress.releasePointerCapture(e.pointerId);
-});
+}
 
 audio.ontimeupdate = () => {
   currentTimeEl.textContent = formatTime(audio.currentTime);
-  progressFill.style.width = (audio.currentTime / audio.duration) * 100 + "%";
+  const pct = audio.currentTime / audio.duration;
+  progressFill.style.width = pct * 100 + "%";
+  thumb.style.left = pct * 100 + "%";
 
   const t = Math.max(0, audio.currentTime - LYRIC_OFFSET);
   const lines = document.querySelectorAll(".lyrics-line");
