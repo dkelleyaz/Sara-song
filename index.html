@@ -20,22 +20,14 @@ html, body {
 body {
   font-family: -apple-system, BlinkMacSystemFont, system-ui, "Helvetica Neue", Arial, sans-serif;
   color: var(--text);
-  background: var(--bg-overlay) url('./assets/bg.jpg') center/cover no-repeat fixed;
+  background:
+    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+    url('./assets/bg.jpg') center / cover no-repeat fixed;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding-top: 36px;
   box-sizing: border-box;
-}
-
-/* subtle parallax */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: inherit;
-  transform: translateY(var(--parallax, 0px));
-  z-index: -1;
 }
 
 .scrim {
@@ -87,14 +79,11 @@ h1 {
   max-height: 45vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  opacity: 0;
-  transition: opacity 0.3s ease;
   display: none;
 }
 
 .lyrics-container.open {
   display: block;
-  opacity: 1;
 }
 
 .lyrics-line {
@@ -102,7 +91,6 @@ h1 {
   font-size: 14px;
   line-height: 1.4;
   opacity: 0.55;
-  transition: opacity 0.25s;
 }
 
 .lyrics-line.active {
@@ -148,14 +136,12 @@ h1 {
   height: 4px;
   background: rgba(255,255,255,0.25);
   border-radius: 2px;
-  position: relative;
 }
 
 .progress-fill {
   height: 100%;
   background: var(--accent);
   width: 0%;
-  border-radius: 2px;
 }
 </style>
 </head>
@@ -184,34 +170,33 @@ h1 {
 </audio>
 
 <script>
-/* 🔧 GLOBAL LYRIC OFFSET (intro before vocals) */
-const LYRIC_OFFSET = 12.5; // seconds
+const LYRIC_OFFSET = 12.5;
 
 const lyricsData = [
-  [0, "God placed, us side by side that day"],
-  [6, "The same team at work where hearts found their way"],
-  [13, "Friendship sparked a love soon grew"],
-  [18, "God’s quiet plan was leading to you"],
-  [25, "Sara my heart still stands in awe"],
-  [31, "God’s grace has carried us through it all"],
-  [37, "Your smile, your eyes, they calm me too"],
-  [44, "God knew my best, would start with you"],
-  [56, "Love Bryce and Gavin with all your heart"],
-  [63, "Through faith and care our family’s grown"],
-  [69, "So strong, so wise, so steady and true"],
-  [75, "God’s love shines brightly through you"],
-  [82, "Sara my heart still stands in awe"],
-  [88, "God’s grace has carried us through it all"],
-  [94, "Your smile, your eyes, they calm me too"],
-  [100, "God knew my best, would start with you"],
-  [113, "From Mexico waves to the oceans hue"],
-  [119, "Diamondback games and laughter too"],
-  [125, "Working from home, still side by side"],
-  [131, "Together all these years, our hearts abide"],
-  [142, "Sara my best friend, my gift, my truth"],
-  [149, "The best human I ever knew"],
-  [155, "Everyday I thank god anew"],
-  [161, "For this life, he wrote, with you"]
+  [0,"God placed, us side by side that day"],
+  [6,"The same team at work where hearts found their way"],
+  [13,"Friendship sparked a love soon grew"],
+  [18,"God’s quiet plan was leading to you"],
+  [25,"Sara my heart still stands in awe"],
+  [31,"God’s grace has carried us through it all"],
+  [37,"Your smile, your eyes, they calm me too"],
+  [44,"God knew my best, would start with you"],
+  [56,"Love Bryce and Gavin with all your heart"],
+  [63,"Through faith and care our family’s grown"],
+  [69,"So strong, so wise, so steady and true"],
+  [75,"God’s love shines brightly through you"],
+  [82,"Sara my heart still stands in awe"],
+  [88,"God’s grace has carried us through it all"],
+  [94,"Your smile, your eyes, they calm me too"],
+  [100,"God knew my best, would start with you"],
+  [113,"From Mexico waves to the oceans hue"],
+  [119,"Diamondback games and laughter too"],
+  [125,"Working from home, still side by side"],
+  [131,"Together all these years, our hearts abide"],
+  [142,"Sara my best friend, my gift, my truth"],
+  [149,"The best human I ever knew"],
+  [155,"Everyday I thank god anew"],
+  [161,"For this life, he wrote, with you"]
 ];
 
 const audio = document.getElementById("audio");
@@ -219,11 +204,11 @@ const lyricsBox = document.getElementById("lyrics");
 const playBtn = document.getElementById("playBtn");
 const progressFill = document.getElementById("progressFill");
 
-lyricsData.forEach(([, text]) => {
-  const div = document.createElement("div");
-  div.className = "lyrics-line";
-  div.textContent = text;
-  lyricsBox.appendChild(div);
+lyricsData.forEach(([_, text]) => {
+  const d = document.createElement("div");
+  d.className = "lyrics-line";
+  d.textContent = text;
+  lyricsBox.appendChild(d);
 });
 
 playBtn.onclick = () => {
@@ -238,13 +223,25 @@ playBtn.onclick = () => {
 
 audio.ontimeupdate = () => {
   progressFill.style.width = (audio.currentTime / audio.duration) * 100 + "%";
-
   const t = Math.max(0, audio.currentTime - LYRIC_OFFSET);
   const lines = document.querySelectorAll(".lyrics-line");
 
   for (let i = 0; i < lyricsData.length; i++) {
-    const [time] = lyricsData[i];
     const next = lyricsData[i + 1]?.[0] ?? Infinity;
+    if (t >= lyricsData[i][0] && t < next) {
+      lines.forEach(l => l.classList.remove("active"));
+      lines[i].classList.add("active");
+      if (lyricsBox.classList.contains("open")) {
+        lines[i].scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+      break;
+    }
+  }
+};
 
-    if (t >= time && t < next) {
-     
+function toggleLyrics() {
+  lyricsBox.classList.toggle("open");
+}
+</script>
+</body>
+</html>
