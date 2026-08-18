@@ -13,7 +13,10 @@
   --bg-dim-lyrics: rgba(0,0,0,0.62);
 }
 
-html, body { height: 100%; margin: 0; }
+html, body {
+  height: 100%;
+  margin: 0;
+}
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, system-ui, "Helvetica Neue", Arial, sans-serif;
@@ -35,6 +38,7 @@ body.lyrics-open {
     url('./assets/bg.jpg') center / cover no-repeat fixed;
 }
 
+/* Song picker */
 .song-picker {
   z-index: 10;
   width: min(92vw, 600px);
@@ -63,7 +67,7 @@ body.lyrics-open {
 }
 
 .song-card {
-  min-height: 145px;
+  min-height: 165px;
   padding: 20px;
   border-radius: 16px;
   border: 1px solid rgba(255,255,255,0.20);
@@ -75,7 +79,10 @@ body.lyrics-open {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .song-card:hover {
@@ -93,10 +100,21 @@ body.lyrics-open {
 
 .song-card-subtitle {
   font-size: 13px;
-  opacity: 0.78;
+  opacity: 0.82;
   line-height: 1.35;
 }
 
+.song-card-credit {
+  margin-top: 11px;
+  padding-top: 10px;
+  width: 86%;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: 0.72;
+}
+
+/* Player card */
 .card {
   z-index: 10;
   backdrop-filter: blur(4px);
@@ -110,7 +128,18 @@ body.lyrics-open {
   display: none;
 }
 
-.card h1 { margin: 0 0 6px; font-size: 19px; font-weight: 600; }
+.card h1 {
+  margin: 0 0 6px;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.song-credit {
+  font-size: 12px;
+  line-height: 1.4;
+  opacity: 0.76;
+  margin: 2px 0 8px;
+}
 
 .dedication {
   font-size: 14px;
@@ -126,7 +155,8 @@ body.lyrics-open {
   margin-bottom: 10px;
 }
 
-.back-btn, .lyrics-toggle {
+.back-btn,
+.lyrics-toggle {
   background: rgba(255,255,255,0.15);
   border: 1px solid rgba(255,255,255,0.25);
   padding: 6px 12px;
@@ -136,8 +166,11 @@ body.lyrics-open {
   cursor: pointer;
 }
 
-.lyrics-toggle { margin-top: 8px; }
+.lyrics-toggle {
+  margin-top: 8px;
+}
 
+/* Lyrics */
 .lyrics-container {
   margin-top: 12px;
   max-height: 45vh;
@@ -146,25 +179,43 @@ body.lyrics-open {
   display: none;
   opacity: 0;
   transform: translateY(-8px);
-  transition: opacity 0.9s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.9s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition:
+    opacity 0.9s cubic-bezier(0.4, 0.0, 0.2, 1),
+    transform 0.9s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-.lyrics-container.open { display: block; opacity: 1; transform: translateY(0); }
+.lyrics-container.open {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
 
 .lyrics-line {
   padding: 6px 0;
   font-size: 14px;
   line-height: 1.4;
-  opacity: 0.55;
-  transition: opacity 0.4s ease, transform 0.4s ease, text-shadow 0.4s ease, color 0.4s ease;
+  opacity: 0.45;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease,
+    text-shadow 0.4s ease,
+    color 0.4s ease;
 }
 
 .lyrics-line.active {
   opacity: 1;
   color: var(--accent);
-  text-shadow: 0 0 6px rgba(244,227,193,0.35), 0 0 14px rgba(244,227,193,0.15);
+  text-shadow:
+    0 0 6px rgba(244,227,193,0.35),
+    0 0 14px rgba(244,227,193,0.15);
 }
 
+/* Untimed lyrics should be fully readable */
+.lyrics-container.untimed .lyrics-line {
+  opacity: 0.92;
+}
+
+/* Play bar */
 .playbar {
   position: fixed;
   bottom: 0;
@@ -195,8 +246,18 @@ body.lyrics-open {
   justify-content: center;
 }
 
-.song-title { flex: 1; font-size: 14px; opacity: 0.9; }
-.time { font-size: 12px; opacity: 0.7; min-width: 38px; text-align: right; }
+.song-title {
+  flex: 1;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.time {
+  font-size: 12px;
+  opacity: 0.7;
+  min-width: 38px;
+  text-align: right;
+}
 
 .progress-wrap {
   flex: 2;
@@ -215,7 +276,12 @@ body.lyrics-open {
   touch-action: none;
 }
 
-.progress-fill { height: 100%; background: var(--accent); width: 0%; border-radius: 2px; }
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  width: 0%;
+  border-radius: 2px;
+}
 
 .thumb {
   position: absolute;
@@ -231,10 +297,21 @@ body.lyrics-open {
 }
 
 @media (max-width: 600px) {
-  .song-options { grid-template-columns: 1fr; }
-  .song-picker { margin-top: 3vh; }
-  .song-card { min-height: 110px; }
-  .song-title { display: none; }
+  .song-options {
+    grid-template-columns: 1fr;
+  }
+
+  .song-picker {
+    margin-top: 3vh;
+  }
+
+  .song-card {
+    min-height: 135px;
+  }
+
+  .song-title {
+    display: none;
+  }
 }
 </style>
 </head>
@@ -249,11 +326,18 @@ body.lyrics-open {
     <button class="song-card" onclick="loadSong('sara')">
       <div class="song-card-title">Sara</div>
       <div class="song-card-subtitle">For Sara — Ten Years, Every Note for You.</div>
+      <div class="song-card-credit">
+        Written, composed &amp; performed by Dave Kelley
+      </div>
     </button>
 
     <button class="song-card" onclick="loadSong('whentimestoodstill')">
       <div class="song-card-title">When Time Stood Still</div>
       <div class="song-card-subtitle">The day life changed as she knew it.</div>
+      <div class="song-card-credit">
+        Written &amp; composed by Dave Kelley<br>
+        Performed by Perry Barton
+      </div>
     </button>
   </div>
 </div>
@@ -264,9 +348,13 @@ body.lyrics-open {
   </div>
 
   <h1 id="pageTitle"></h1>
+  <div id="pageCredit" class="song-credit"></div>
   <div id="dedication" class="dedication"></div>
 
-  <button id="lyricsToggle" class="lyrics-toggle" onclick="toggleLyrics()">Show Lyrics</button>
+  <button id="lyricsToggle" class="lyrics-toggle" onclick="toggleLyrics()">
+    Show Lyrics
+  </button>
+
   <div id="lyrics" class="lyrics-container"></div>
 </main>
 
@@ -291,7 +379,8 @@ body.lyrics-open {
 const songs = {
   sara: {
     title: "Sara",
-    artist: "Dave Kelley",
+    performer: "Dave Kelley",
+    credit: "Written, composed & performed by Dave Kelley",
     audio: "Sara.mp3",
     dedication: "For Sara — Ten Years, Every Note for You.",
     lyricOffset: 12.5,
@@ -326,7 +415,8 @@ const songs = {
 
   whentimestoodstill: {
     title: "When Time Stood Still",
-    artist: "Dave Kelley",
+    performer: "Perry Barton",
+    credit: "Written & composed by Dave Kelley • Performed by Perry Barton",
     audio: "whentimestoodstill.mp3",
     dedication: "The day life changed as she knew it.",
     lyricOffset: 0,
@@ -340,10 +430,12 @@ const songs = {
       [0,"Talking 'bout forever, talking 'bout now"],
       [0,"You were praying for the life we’d find"],
       [0,"Wondering if two faiths could share one bind"],
+
       [0,"Pulled off the highway, one more stop to go"],
       [0,"Tank running low, hearts running slow"],
       [0,"I was just a guy at the pump, unaware"],
       [0,"Heaven picked that moment to answer your prayer"],
+
       [0,"When time stood still"],
       [0,"Out by the road"],
       [0,"When time stood still"],
@@ -352,6 +444,7 @@ const songs = {
       [0,"Love was making room"],
       [0,"When time stood still"],
       [0,"Right there with you"],
+
       [0,"After that trip, we kept on waiting"],
       [0,"For wedding rings and a door worth opening"],
       [0,"No moving in until the vows were done"],
@@ -360,10 +453,12 @@ const songs = {
       [0,"Life came another way, but it still changed"],
       [0,"You found those boys and loved them like home"],
       [0,"Step by step, they were never alone"],
+
       [0,"And I saw it plain in the way you smiled"],
       [0,"Like something broken had been reconciled"],
       [0,"You were asking God for a place to belong"],
       [0,"Then love answered back super strong"],
+
       [0,"When time stood still"],
       [0,"Out by the road"],
       [0,"When time stood still"],
@@ -372,6 +467,7 @@ const songs = {
       [0,"Love was making room"],
       [0,"When time stood still"],
       [0,"Right there with you"],
+
       [0,"You tried to hide it, turned your face away"],
       [0,"But I could tell, so I asked you anyway"],
       [0,"You said the Spirit gave you your answer"],
@@ -395,6 +491,7 @@ const songPicker = document.getElementById("songPicker");
 const songPage = document.getElementById("songPage");
 const playbar = document.getElementById("playbar");
 const pageTitle = document.getElementById("pageTitle");
+const pageCredit = document.getElementById("pageCredit");
 const playerTitle = document.getElementById("playerTitle");
 const dedication = document.getElementById("dedication");
 const lyricsToggle = document.getElementById("lyricsToggle");
@@ -412,17 +509,22 @@ let isScrubbing = false;
 
 function loadSong(songKey) {
   currentSong = songs[songKey];
+
   audio.pause();
   audio.currentTime = 0;
   playBtn.textContent = "▶";
+
   audio.src = currentSong.audio;
   audio.load();
 
-  pageTitle.textContent = `“${currentSong.title}” — ${currentSong.artist}`;
-  playerTitle.textContent = `${currentSong.title} — ${currentSong.artist}`;
+  pageTitle.textContent = `“${currentSong.title}”`;
+  pageCredit.textContent = currentSong.credit;
+  playerTitle.textContent = `${currentSong.title} — ${currentSong.performer}`;
   dedication.textContent = currentSong.dedication;
 
   lyricsBox.innerHTML = "";
+  lyricsBox.classList.toggle("untimed", !currentSong.timedLyrics);
+
   currentSong.lyrics.forEach(([_, text]) => {
     const d = document.createElement("div");
     d.className = "lyrics-line";
@@ -430,7 +532,9 @@ function loadSong(songKey) {
     lyricsBox.appendChild(d);
   });
 
-  lyricsToggle.style.display = currentSong.lyrics.length > 0 ? "inline-block" : "none";
+  lyricsToggle.style.display =
+    currentSong.lyrics.length > 0 ? "inline-block" : "none";
+
   lyricsToggle.textContent = "Show Lyrics";
   lyricsBox.classList.remove("open");
   document.body.classList.remove("lyrics-open");
@@ -449,16 +553,25 @@ function showSongPicker() {
   audio.pause();
   audio.currentTime = 0;
   playBtn.textContent = "▶";
+
   songPage.style.display = "none";
   playbar.style.display = "none";
+
   lyricsBox.classList.remove("open");
   document.body.classList.remove("lyrics-open");
   lyricsToggle.textContent = "Show Lyrics";
+
   songPicker.style.display = "block";
 }
 
 audio.onloadedmetadata = () => {
   durationEl.textContent = formatTime(audio.duration);
+};
+
+audio.onerror = () => {
+  playBtn.textContent = "▶";
+  durationEl.textContent = "—";
+  console.error("Audio failed to load:", currentSong?.audio, audio.error);
 };
 
 audio.onended = () => {
@@ -467,8 +580,14 @@ audio.onended = () => {
 
 playBtn.onclick = () => {
   if (audio.paused) {
-    audio.play();
-    playBtn.textContent = "❚❚";
+    audio.play()
+      .then(() => {
+        playBtn.textContent = "❚❚";
+      })
+      .catch(err => {
+        playBtn.textContent = "▶";
+        console.error("Audio playback failed:", err);
+      });
   } else {
     audio.pause();
     playBtn.textContent = "▶";
@@ -493,8 +612,13 @@ progressWrap.addEventListener("pointerup", e => {
 
 function scrub(e) {
   if (!audio.duration) return;
+
   const rect = progress.getBoundingClientRect();
-  const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+  const pct = Math.min(
+    Math.max((e.clientX - rect.left) / rect.width, 0),
+    1
+  );
+
   audio.currentTime = pct * audio.duration;
 }
 
@@ -509,21 +633,34 @@ audio.ontimeupdate = () => {
     thumb.style.left = pct * 100 + "%";
   }
 
-  if (!currentSong.lyrics.length || !currentSong.timedLyrics) return;
+  if (!currentSong.lyrics.length || !currentSong.timedLyrics) {
+    return;
+  }
 
-  const t = Math.max(0, audio.currentTime - currentSong.lyricOffset);
+  const t = Math.max(
+    0,
+    audio.currentTime - currentSong.lyricOffset
+  );
+
   const lines = document.querySelectorAll(".lyrics-line");
 
   for (let i = 0; i < currentSong.lyrics.length; i++) {
     const next = currentSong.lyrics[i + 1]?.[0] ?? Infinity;
 
-    if (t >= currentSong.lyrics[i][0] && t < next) {
+    if (
+      t >= currentSong.lyrics[i][0] &&
+      t < next
+    ) {
       lines.forEach(l => l.classList.remove("active"));
       lines[i].classList.add("active");
 
       if (lyricsBox.classList.contains("open")) {
-        lines[i].scrollIntoView({ block: "center", behavior: "smooth" });
+        lines[i].scrollIntoView({
+          block: "center",
+          behavior: "smooth"
+        });
       }
+
       break;
     }
   }
@@ -532,13 +669,21 @@ audio.ontimeupdate = () => {
 function toggleLyrics() {
   lyricsBox.classList.toggle("open");
   document.body.classList.toggle("lyrics-open");
-  lyricsToggle.textContent = lyricsBox.classList.contains("open") ? "Hide Lyrics" : "Show Lyrics";
+
+  lyricsToggle.textContent =
+    lyricsBox.classList.contains("open")
+      ? "Hide Lyrics"
+      : "Show Lyrics";
 }
 
 function formatTime(sec) {
   if (!Number.isFinite(sec)) return "0:00";
+
   const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60).toString().padStart(2, "0");
+  const s = Math.floor(sec % 60)
+    .toString()
+    .padStart(2, "0");
+
   return `${m}:${s}`;
 }
 </script>
