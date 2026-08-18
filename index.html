@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Sara — Dave Kelley</title>
+<title>Dave Kelley — Songs</title>
 
 <style>
 :root {
@@ -38,7 +38,79 @@ body.lyrics-open {
     url('./assets/bg.jpg') center / cover no-repeat fixed;
 }
 
-/* Card */
+
+/* -------------------------
+   SONG SELECTION
+-------------------------- */
+
+.song-picker {
+  z-index: 10;
+  width: min(92vw, 600px);
+  text-align: center;
+  margin-top: 8vh;
+}
+
+.song-picker h1 {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.song-picker-subtitle {
+  color: var(--accent);
+  opacity: 0.9;
+  margin-bottom: 28px;
+}
+
+.song-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.song-card {
+  min-height: 145px;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.20);
+  background: rgba(0,0,0,0.38);
+  backdrop-filter: blur(6px);
+  color: var(--text);
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.song-card:hover {
+  transform: translateY(-3px);
+  background: rgba(0,0,0,0.52);
+  border-color: rgba(244,227,193,0.55);
+}
+
+.song-card-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.song-card-subtitle {
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+
+/* -------------------------
+   PLAYER CARD
+-------------------------- */
+
 .card {
   z-index: 10;
   backdrop-filter: blur(4px);
@@ -49,6 +121,7 @@ body.lyrics-open {
   width: min(92vw, 460px);
   text-align: center;
   box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  display: none;
 }
 
 h1 {
@@ -64,8 +137,15 @@ h1 {
   margin-bottom: 8px;
 }
 
+.top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.back-btn,
 .lyrics-toggle {
-  margin-top: 8px;
   background: rgba(255,255,255,0.15);
   border: 1px solid rgba(255,255,255,0.25);
   padding: 6px 12px;
@@ -75,7 +155,15 @@ h1 {
   cursor: pointer;
 }
 
-/* Lyrics panel */
+.lyrics-toggle {
+  margin-top: 8px;
+}
+
+
+/* -------------------------
+   LYRICS
+-------------------------- */
+
 .lyrics-container {
   margin-top: 12px;
   max-height: 45vh;
@@ -115,7 +203,11 @@ h1 {
     0 0 14px rgba(244,227,193,0.15);
 }
 
-/* Play bar */
+
+/* -------------------------
+   PLAY BAR
+-------------------------- */
+
 .playbar {
   position: fixed;
   bottom: 0;
@@ -126,7 +218,7 @@ h1 {
   backdrop-filter: blur(10px);
   background: rgba(0,0,0,0.35);
   border-top: 1px solid rgba(255,255,255,0.12);
-  display: flex;
+  display: none;
   align-items: center;
   gap: 10px;
 }
@@ -195,155 +287,566 @@ h1 {
   box-shadow: 0 0 6px rgba(0,0,0,0.4);
   pointer-events: none;
 }
+
+
+/* -------------------------
+   MOBILE
+-------------------------- */
+
+@media (max-width: 600px) {
+
+  .song-options {
+    grid-template-columns: 1fr;
+  }
+
+  .song-picker {
+    margin-top: 3vh;
+  }
+
+  .song-card {
+    min-height: 110px;
+  }
+
+  .song-title {
+    display: none;
+  }
+}
 </style>
 </head>
 
+
 <body>
 
-<main class="card">
-  <h1>“Sara” — Dave Kelley</h1>
-  <div class="dedication">For Sara — Ten Years, Every Note for You.</div>
-  <button class="lyrics-toggle" onclick="toggleLyrics()">Show Lyrics</button>
+
+<!-- SONG PICKER -->
+
+<div id="songPicker" class="song-picker">
+
+  <h1>Dave Kelley</h1>
+
+  <div class="song-picker-subtitle">
+    Select a song
+  </div>
+
+  <div class="song-options">
+
+    <button class="song-card" onclick="loadSong('sara')">
+      <div class="song-card-title">Sara</div>
+      <div class="song-card-subtitle">
+        For Sara — Ten Years, Every Note for You.
+      </div>
+    </button>
+
+    <button class="song-card" onclick="loadSong('whentimestoodstill')">
+      <div class="song-card-title">When Time Stood Still</div>
+      <div class="song-card-subtitle">
+        Listen
+      </div>
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- SONG PAGE -->
+
+<main id="songPage" class="card">
+
+  <div class="top-controls">
+    <button class="back-btn" onclick="showSongPicker()">← Songs</button>
+  </div>
+
+  <h1 id="pageTitle"></h1>
+
+  <div id="dedication" class="dedication"></div>
+
+  <button
+    id="lyricsToggle"
+    class="lyrics-toggle"
+    onclick="toggleLyrics()">
+    Show Lyrics
+  </button>
+
   <div id="lyrics" class="lyrics-container"></div>
+
 </main>
 
-<div class="playbar">
+
+<!-- PLAY BAR -->
+
+<div id="playbar" class="playbar">
+
   <button id="playBtn" class="play-btn">▶</button>
-  <div class="song-title">Sara — Dave Kelley</div>
+
+  <div id="playerTitle" class="song-title"></div>
+
   <div id="currentTime" class="time">0:00</div>
 
   <div id="progressWrap" class="progress-wrap">
+
     <div id="progress" class="progress">
       <div id="progressFill" class="progress-fill"></div>
     </div>
+
     <div id="thumb" class="thumb"></div>
+
   </div>
 
   <div id="duration" class="time">0:00</div>
+
 </div>
 
-<audio id="audio">
-  <source src="Sara.mp3" type="audio/mpeg">
-</audio>
+
+<audio id="audio"></audio>
+
 
 <script>
-/* --- JS unchanged from previous working version --- */
-const LYRIC_OFFSET = 12.5;
 
-const lyricsData = [
-  [0,"God placed, us side by side that day"],
-  [6,"The same team at work where hearts found their way"],
-  [13,"Friendship sparked a love soon grew"],
-  [18,"God’s quiet plan was leading to you"],
-  [25,"Sara my heart still stands in awe"],
-  [31,"God’s grace has carried us through it all"],
-  [37,"Your smile, your eyes, they calm me too"],
-  [44,"God knew my best, would start with you"],
-  [56,"Love Bryce and Gavin with all your heart"],
-  [63,"Through faith and care our family’s grown"],
-  [69,"So strong, so wise, so steady and true"],
-  [75,"God’s love shines brightly through you"],
-  [82,"Sara my heart still stands in awe"],
-  [88,"God’s grace has carried us through it all"],
-  [94,"Your smile, your eyes, they calm me too"],
-  [100,"God knew my best, would start with you"],
-  [113,"From Mexico waves to the oceans hue"],
-  [119,"Diamondback games and laughter too"],
-  [125,"Working from home, still side by side"],
-  [131,"Together all these years, our hearts abide"],
-  [142,"Sara my best friend, my gift, my truth"],
-  [149,"The best human I ever knew"],
-  [155,"Everyday I thank god anew"],
-  [161,"For this life, he wrote, with you"]
-];
+
+/* ==========================================================
+   SONG INFORMATION
+
+   When we're ready for the new song's lyrics/timings,
+   we'll add them right here.
+========================================================== */
+
+
+const songs = {
+
+  sara: {
+
+    title: "Sara",
+    artist: "Dave Kelley",
+
+    audio: "Sara.mp3",
+
+    dedication:
+      "For Sara — Ten Years, Every Note for You.",
+
+    lyricOffset: 12.5,
+
+    lyrics: [
+
+      [0,"God placed, us side by side that day"],
+      [6,"The same team at work where hearts found their way"],
+      [13,"Friendship sparked a love soon grew"],
+      [18,"God’s quiet plan was leading to you"],
+      [25,"Sara my heart still stands in awe"],
+      [31,"God’s grace has carried us through it all"],
+      [37,"Your smile, your eyes, they calm me too"],
+      [44,"God knew my best, would start with you"],
+      [56,"Love Bryce and Gavin with all your heart"],
+      [63,"Through faith and care our family’s grown"],
+      [69,"So strong, so wise, so steady and true"],
+      [75,"God’s love shines brightly through you"],
+      [82,"Sara my heart still stands in awe"],
+      [88,"God’s grace has carried us through it all"],
+      [94,"Your smile, your eyes, they calm me too"],
+      [100,"God knew my best, would start with you"],
+      [113,"From Mexico waves to the oceans hue"],
+      [119,"Diamondback games and laughter too"],
+      [125,"Working from home, still side by side"],
+      [131,"Together all these years, our hearts abide"],
+      [142,"Sara my best friend, my gift, my truth"],
+      [149,"The best human I ever knew"],
+      [155,"Everyday I thank god anew"],
+      [161,"For this life, he wrote, with you"]
+
+    ]
+
+  },
+
+
+  whentimestoodstill: {
+
+    title: "When Time Stood Still",
+    artist: "Dave Kelley",
+
+    audio: "whentimestoodstill.mp3",
+
+    dedication: "",
+
+    lyricOffset: 0,
+
+    lyrics: []
+
+  }
+
+};
+
+
+
+/* ==========================================================
+   ELEMENTS
+========================================================== */
+
 
 const audio = document.getElementById("audio");
+
+const songPicker = document.getElementById("songPicker");
+const songPage = document.getElementById("songPage");
+
+const playbar = document.getElementById("playbar");
+
+const pageTitle = document.getElementById("pageTitle");
+const playerTitle = document.getElementById("playerTitle");
+const dedication = document.getElementById("dedication");
+
+const lyricsToggle = document.getElementById("lyricsToggle");
+const lyricsBox = document.getElementById("lyrics");
+
 const playBtn = document.getElementById("playBtn");
+
 const progress = document.getElementById("progress");
 const progressFill = document.getElementById("progressFill");
 const thumb = document.getElementById("thumb");
 const progressWrap = document.getElementById("progressWrap");
+
 const currentTimeEl = document.getElementById("currentTime");
 const durationEl = document.getElementById("duration");
-const lyricsBox = document.getElementById("lyrics");
 
-lyricsData.forEach(([_, text]) => {
-  const d = document.createElement("div");
-  d.className = "lyrics-line";
-  d.textContent = text;
-  lyricsBox.appendChild(d);
-});
 
-audio.onloadedmetadata = () => {
-  durationEl.textContent = formatTime(audio.duration);
-};
-
-playBtn.onclick = () => {
-  if (audio.paused) {
-    audio.play();
-    playBtn.textContent = "❚❚";
-  } else {
-    audio.pause();
-    playBtn.textContent = "▶";
-  }
-};
-
+let currentSong = null;
 let isScrubbing = false;
 
-progressWrap.addEventListener("pointerdown", e => {
-  isScrubbing = true;
-  progressWrap.setPointerCapture(e.pointerId);
-  scrub(e);
-});
 
-progressWrap.addEventListener("pointermove", e => {
-  if (!isScrubbing) return;
-  scrub(e);
-});
 
-progressWrap.addEventListener("pointerup", e => {
-  isScrubbing = false;
-  progressWrap.releasePointerCapture(e.pointerId);
-});
+/* ==========================================================
+   LOAD SONG
+========================================================== */
 
-function scrub(e) {
-  const rect = progress.getBoundingClientRect();
-  const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
-  audio.currentTime = pct * audio.duration;
+
+function loadSong(songKey) {
+
+  currentSong = songs[songKey];
+
+  audio.pause();
+  audio.currentTime = 0;
+
+  playBtn.textContent = "▶";
+
+  audio.src = currentSong.audio;
+  audio.load();
+
+
+  pageTitle.textContent =
+    `“${currentSong.title}” — ${currentSong.artist}`;
+
+  playerTitle.textContent =
+    `${currentSong.title} — ${currentSong.artist}`;
+
+  dedication.textContent =
+    currentSong.dedication;
+
+
+  /* Build lyrics */
+
+  lyricsBox.innerHTML = "";
+
+  currentSong.lyrics.forEach(([_, text]) => {
+
+    const d = document.createElement("div");
+
+    d.className = "lyrics-line";
+    d.textContent = text;
+
+    lyricsBox.appendChild(d);
+
+  });
+
+
+  /* Hide lyrics button if song has no lyrics yet */
+
+  if (currentSong.lyrics.length > 0) {
+
+    lyricsToggle.style.display = "inline-block";
+
+  } else {
+
+    lyricsToggle.style.display = "none";
+
+  }
+
+
+  lyricsBox.classList.remove("open");
+
+  document.body.classList.remove("lyrics-open");
+
+
+  /* Reset progress */
+
+  progressFill.style.width = "0%";
+  thumb.style.left = "0%";
+
+  currentTimeEl.textContent = "0:00";
+  durationEl.textContent = "0:00";
+
+
+  /* Switch screens */
+
+  songPicker.style.display = "none";
+  songPage.style.display = "block";
+  playbar.style.display = "flex";
+
 }
 
-audio.ontimeupdate = () => {
-  currentTimeEl.textContent = formatTime(audio.currentTime);
-  const pct = audio.currentTime / audio.duration;
-  progressFill.style.width = pct * 100 + "%";
-  thumb.style.left = pct * 100 + "%";
 
-  const t = Math.max(0, audio.currentTime - LYRIC_OFFSET);
-  const lines = document.querySelectorAll(".lyrics-line");
 
-  for (let i = 0; i < lyricsData.length; i++) {
-    const next = lyricsData[i + 1]?.[0] ?? Infinity;
-    if (t >= lyricsData[i][0] && t < next) {
-      lines.forEach(l => l.classList.remove("active"));
-      lines[i].classList.add("active");
-      if (lyricsBox.classList.contains("open")) {
-        lines[i].scrollIntoView({ block: "center", behavior: "smooth" });
-      }
-      break;
-    }
-  }
+/* ==========================================================
+   RETURN TO SONG LIST
+========================================================== */
+
+
+function showSongPicker() {
+
+  audio.pause();
+  audio.currentTime = 0;
+
+  playBtn.textContent = "▶";
+
+  songPage.style.display = "none";
+  playbar.style.display = "none";
+
+  lyricsBox.classList.remove("open");
+  document.body.classList.remove("lyrics-open");
+
+  songPicker.style.display = "block";
+
+}
+
+
+
+/* ==========================================================
+   AUDIO
+========================================================== */
+
+
+audio.onloadedmetadata = () => {
+
+  durationEl.textContent =
+    formatTime(audio.duration);
+
 };
 
-function toggleLyrics() {
-  lyricsBox.classList.toggle("open");
-  document.body.classList.toggle("lyrics-open");
+
+audio.onended = () => {
+
+  playBtn.textContent = "▶";
+
+};
+
+
+playBtn.onclick = () => {
+
+  if (audio.paused) {
+
+    audio.play();
+
+    playBtn.textContent = "❚❚";
+
+  } else {
+
+    audio.pause();
+
+    playBtn.textContent = "▶";
+
+  }
+
+};
+
+
+
+/* ==========================================================
+   SCRUBBER
+========================================================== */
+
+
+progressWrap.addEventListener("pointerdown", e => {
+
+  isScrubbing = true;
+
+  progressWrap.setPointerCapture(e.pointerId);
+
+  scrub(e);
+
+});
+
+
+progressWrap.addEventListener("pointermove", e => {
+
+  if (!isScrubbing) return;
+
+  scrub(e);
+
+});
+
+
+progressWrap.addEventListener("pointerup", e => {
+
+  isScrubbing = false;
+
+  progressWrap.releasePointerCapture(e.pointerId);
+
+});
+
+
+function scrub(e) {
+
+  if (!audio.duration) return;
+
+  const rect =
+    progress.getBoundingClientRect();
+
+  const pct =
+    Math.min(
+      Math.max(
+        (e.clientX - rect.left) / rect.width,
+        0
+      ),
+      1
+    );
+
+  audio.currentTime =
+    pct * audio.duration;
+
 }
 
-function formatTime(sec) {
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60).toString().padStart(2, "0");
-  return `${m}:${s}`;
+
+
+/* ==========================================================
+   PROGRESS + LYRICS
+========================================================== */
+
+
+audio.ontimeupdate = () => {
+
+  if (!currentSong) return;
+
+
+  currentTimeEl.textContent =
+    formatTime(audio.currentTime);
+
+
+  if (audio.duration) {
+
+    const pct =
+      audio.currentTime / audio.duration;
+
+    progressFill.style.width =
+      pct * 100 + "%";
+
+    thumb.style.left =
+      pct * 100 + "%";
+
+  }
+
+
+  if (!currentSong.lyrics.length)
+    return;
+
+
+  const t =
+    Math.max(
+      0,
+      audio.currentTime - currentSong.lyricOffset
+    );
+
+
+  const lines =
+    document.querySelectorAll(".lyrics-line");
+
+
+  for (
+    let i = 0;
+    i < currentSong.lyrics.length;
+    i++
+  ) {
+
+    const next =
+      currentSong.lyrics[i + 1]?.[0]
+      ?? Infinity;
+
+
+    if (
+      t >= currentSong.lyrics[i][0]
+      &&
+      t < next
+    ) {
+
+      lines.forEach(
+        l => l.classList.remove("active")
+      );
+
+
+      lines[i].classList.add("active");
+
+
+      if (
+        lyricsBox.classList.contains("open")
+      ) {
+
+        lines[i].scrollIntoView({
+          block: "center",
+          behavior: "smooth"
+        });
+
+      }
+
+      break;
+
+    }
+
+  }
+
+};
+
+
+
+/* ==========================================================
+   LYRICS TOGGLE
+========================================================== */
+
+
+function toggleLyrics() {
+
+  lyricsBox.classList.toggle("open");
+
+  document.body.classList.toggle("lyrics-open");
+
+
+  lyricsToggle.textContent =
+    lyricsBox.classList.contains("open")
+      ? "Hide Lyrics"
+      : "Show Lyrics";
+
 }
+
+
+
+/* ==========================================================
+   TIME FORMAT
+========================================================== */
+
+
+function formatTime(sec) {
+
+  if (!Number.isFinite(sec))
+    return "0:00";
+
+  const m =
+    Math.floor(sec / 60);
+
+  const s =
+    Math.floor(sec % 60)
+      .toString()
+      .padStart(2, "0");
+
+  return `${m}:${s}`;
+
+}
+
+
 </script>
 
 </body>
