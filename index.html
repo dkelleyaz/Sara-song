@@ -9,6 +9,11 @@
 :root {
   --accent: #f4e3c1;
   --text: #ffffff;
+  --text-soft: rgba(255,255,255,0.72);
+  --text-faint: rgba(255,255,255,0.52);
+  --panel: rgba(18,18,18,0.34);
+  --panel-strong: rgba(18,18,18,0.48);
+  --border: rgba(255,255,255,0.14);
   --bg-dim: rgba(0,0,0,0.22);
   --bg-dim-lyrics: rgba(0,0,0,0.62);
 }
@@ -19,7 +24,16 @@ html, body {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
   color: var(--text);
   background:
     linear-gradient(var(--bg-dim), var(--bg-dim)),
@@ -30,6 +44,8 @@ body {
   padding-top: 36px;
   box-sizing: border-box;
   transition: background 1.1s cubic-bezier(0.4, 0.0, 0.2, 1);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body.lyrics-open {
@@ -38,150 +54,202 @@ body.lyrics-open {
     url('./assets/bg.jpg') center / cover no-repeat fixed;
 }
 
-/* Song picker */
+button {
+  font: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* -------------------------
+   SONG PICKER
+-------------------------- */
+
 .song-picker {
   z-index: 10;
-  width: min(92vw, 600px);
+  width: min(92vw, 620px);
   text-align: center;
   margin-top: 8vh;
 }
 
-.song-picker h1 {
-  font-size: 26px;
-  margin: 0 0 8px;
-  font-weight: 600;
+.site-name {
+  margin-bottom: 8px;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.song-picker-subtitle {
-  color: var(--accent);
-  opacity: 0.92;
-  margin-bottom: 28px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 17px;
+.song-picker h1 {
+  margin: 0 0 30px;
+  font-size: clamp(25px, 5vw, 31px);
+  line-height: 1.12;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
 .song-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: 16px;
 }
 
 .song-card {
-  min-height: 165px;
-  padding: 20px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.20);
-  background: rgba(0,0,0,0.38);
-  backdrop-filter: blur(6px);
+  min-height: 170px;
+  padding: 22px 20px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: var(--text);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.22);
   transition:
-    transform 0.25s ease,
-    background 0.25s ease,
-    border-color 0.25s ease;
+    transform 0.22s ease,
+    background 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
 }
 
 .song-card:hover {
-  transform: translateY(-3px);
-  background: rgba(0,0,0,0.52);
-  border-color: rgba(244,227,193,0.55);
+  transform: translateY(-2px);
+  background: var(--panel-strong);
+  border-color: rgba(255,255,255,0.24);
+  box-shadow: 0 15px 42px rgba(0,0,0,0.30);
+}
+
+.song-card:active {
+  transform: translateY(0);
 }
 
 .song-card-title {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 22px;
-  color: var(--accent);
   margin-bottom: 8px;
+  font-size: 21px;
+  line-height: 1.18;
+  font-weight: 600;
+  letter-spacing: -0.018em;
 }
 
 .song-card-subtitle {
+  max-width: 250px;
   font-size: 13px;
-  opacity: 0.82;
-  line-height: 1.35;
+  line-height: 1.45;
+  font-weight: 400;
+  color: var(--text-soft);
 }
 
 .song-card-credit {
-  margin-top: 11px;
-  padding-top: 10px;
-  width: 86%;
-  border-top: 1px solid rgba(255,255,255,0.12);
-  font-size: 12px;
+  margin-top: 13px;
+  padding-top: 11px;
+  width: 88%;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  font-size: 11.5px;
   line-height: 1.45;
-  opacity: 0.72;
+  font-weight: 400;
+  color: var(--text-faint);
 }
 
-/* Player card */
+/* -------------------------
+   PLAYER CARD
+-------------------------- */
+
 .card {
   z-index: 10;
-  backdrop-filter: blur(4px);
-  background: rgba(0,0,0,0.30);
-  border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 14px;
-  padding: 14px 18px;
-  width: min(92vw, 460px);
+  width: min(92vw, 480px);
+  padding: 16px 20px 18px;
+  box-sizing: border-box;
   text-align: center;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 14px 44px rgba(0,0,0,0.32);
   display: none;
 }
 
 .card h1 {
-  margin: 0 0 6px;
-  font-size: 19px;
+  margin: 2px 0 6px;
+  font-size: 22px;
+  line-height: 1.18;
   font-weight: 600;
+  letter-spacing: -0.022em;
 }
 
 .song-credit {
+  margin: 0 0 7px;
   font-size: 12px;
-  line-height: 1.4;
-  opacity: 0.76;
-  margin: 2px 0 8px;
+  line-height: 1.45;
+  font-weight: 400;
+  color: var(--text-soft);
 }
 
 .dedication {
-  font-size: 14px;
+  margin: 0 0 9px;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 400;
   color: var(--accent);
-  opacity: 0.9;
-  margin-bottom: 8px;
+  opacity: 0.92;
 }
 
 .top-controls {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 11px;
 }
 
 .back-btn,
 .lyrics-toggle {
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
-  padding: 6px 12px;
-  color: var(--accent);
-  font-size: 13px;
-  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 9px;
+  background: rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.88);
   cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.back-btn {
+  padding: 6px 10px;
 }
 
 .lyrics-toggle {
   margin-top: 8px;
+  padding: 7px 12px;
 }
 
-/* Lyrics */
+.back-btn:hover,
+.lyrics-toggle:hover {
+  background: rgba(255,255,255,0.16);
+  border-color: rgba(255,255,255,0.26);
+}
+
+/* -------------------------
+   LYRICS
+-------------------------- */
+
 .lyrics-container {
-  margin-top: 12px;
+  margin-top: 13px;
   max-height: 45vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   display: none;
   opacity: 0;
-  transform: translateY(-8px);
+  transform: translateY(-6px);
   transition:
-    opacity 0.9s cubic-bezier(0.4, 0.0, 0.2, 1),
-    transform 0.9s cubic-bezier(0.4, 0.0, 0.2, 1);
+    opacity 0.55s cubic-bezier(0.4, 0.0, 0.2, 1),
+    transform 0.55s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .lyrics-container.open {
@@ -193,29 +261,34 @@ body.lyrics-open {
 .lyrics-line {
   padding: 6px 0;
   font-size: 14px;
-  line-height: 1.4;
-  opacity: 0.45;
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: -0.004em;
+  opacity: 0.40;
   transition:
-    opacity 0.4s ease,
-    transform 0.4s ease,
-    text-shadow 0.4s ease,
-    color 0.4s ease;
+    opacity 0.35s ease,
+    transform 0.35s ease,
+    text-shadow 0.35s ease,
+    color 0.35s ease;
 }
 
 .lyrics-line.active {
   opacity: 1;
   color: var(--accent);
   text-shadow:
-    0 0 6px rgba(244,227,193,0.35),
-    0 0 14px rgba(244,227,193,0.15);
+    0 0 6px rgba(244,227,193,0.30),
+    0 0 14px rgba(244,227,193,0.12);
 }
 
-/* Untimed lyrics should be fully readable */
+/* Until every timestamp is entered, untimed lyrics stay fully readable. */
 .lyrics-container.untimed .lyrics-line {
   opacity: 0.92;
 }
 
-/* Play bar */
+/* -------------------------
+   PLAY BAR
+-------------------------- */
+
 .playbar {
   position: fixed;
   bottom: 0;
@@ -223,9 +296,10 @@ body.lyrics-open {
   right: 0;
   z-index: 20;
   padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
-  backdrop-filter: blur(10px);
-  background: rgba(0,0,0,0.35);
-  border-top: 1px solid rgba(255,255,255,0.12);
+  background: rgba(14,14,14,0.46);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,255,255,0.10);
   display: none;
   align-items: center;
   gap: 10px;
@@ -234,11 +308,12 @@ body.lyrics-open {
 .play-btn {
   width: 34px;
   height: 34px;
+  flex: 0 0 34px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.35);
-  background: rgba(0,0,0,0.85);
-  color: #f5f5f5;
-  font-size: 16px;
+  border: 1px solid rgba(255,255,255,0.24);
+  background: rgba(0,0,0,0.72);
+  color: #ffffff;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
   display: flex;
@@ -248,15 +323,18 @@ body.lyrics-open {
 
 .song-title {
   flex: 1;
-  font-size: 14px;
-  opacity: 0.9;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.006em;
+  color: rgba(255,255,255,0.86);
 }
 
 .time {
-  font-size: 12px;
-  opacity: 0.7;
   min-width: 38px;
   text-align: right;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255,255,255,0.62);
 }
 
 .progress-wrap {
@@ -270,47 +348,65 @@ body.lyrics-open {
 .progress {
   width: 100%;
   height: 4px;
-  background: rgba(255,255,255,0.25);
-  border-radius: 2px;
   position: relative;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.22);
   touch-action: none;
 }
 
 .progress-fill {
-  height: 100%;
-  background: var(--accent);
   width: 0%;
-  border-radius: 2px;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
 }
 
 .thumb {
   position: absolute;
   left: 0;
   top: 50%;
-  transform: translate(-50%, -50%);
   width: 14px;
   height: 14px;
-  background: var(--accent);
+  transform: translate(-50%, -50%);
   border-radius: 50%;
-  box-shadow: 0 0 6px rgba(0,0,0,0.4);
+  background: var(--accent);
+  box-shadow: 0 1px 7px rgba(0,0,0,0.42);
   pointer-events: none;
 }
 
+/* -------------------------
+   MOBILE
+-------------------------- */
+
 @media (max-width: 600px) {
-  .song-options {
-    grid-template-columns: 1fr;
+  body {
+    padding-top: 24px;
   }
 
   .song-picker {
     margin-top: 3vh;
   }
 
+  .song-picker h1 {
+    margin-bottom: 22px;
+  }
+
+  .song-options {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
   .song-card {
-    min-height: 135px;
+    min-height: 138px;
   }
 
   .song-title {
     display: none;
+  }
+
+  .card {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
 </style>
@@ -319,8 +415,8 @@ body.lyrics-open {
 <body>
 
 <div id="songPicker" class="song-picker">
-  <h1>Dave Kelley</h1>
-  <div class="song-picker-subtitle">Two Songs, One Story</div>
+  <div class="site-name">Dave Kelley</div>
+  <h1>Two Songs, One Story</h1>
 
   <div class="song-options">
     <button class="song-card" onclick="loadSong('sara')">
@@ -384,7 +480,6 @@ const songs = {
     audio: "Sara.mp3",
     dedication: "For Sara — Ten Years, Every Note for You.",
     lyricOffset: 12.5,
-    timedLyrics: true,
     lyrics: [
       [0,"God placed, us side by side that day"],
       [6,"The same team at work where hearts found their way"],
@@ -420,7 +515,20 @@ const songs = {
     audio: "whentimestoodstill.mp3",
     dedication: "The day life changed as she knew it.",
     lyricOffset: 0,
-    timedLyrics: false,
+
+    /*
+      TIMING:
+      Replace the first 0 on each lyric line with the time, in seconds,
+      when Perry begins singing that line.
+
+      Example:
+      [13.8,"We spent the whole day chasing red rock and daylight"],
+      [19.6,"Sedona sun on your face, everything felt right"],
+
+      Decimals are fine. Once EVERY line has a strictly increasing
+      timestamp, the site automatically turns on highlighting/scrolling.
+      Nothing else needs to be changed.
+    */
     lyrics: [
       [0,"We spent the whole day chasing red rock and daylight"],
       [0,"Sedona sun on your face, everything felt right"],
@@ -507,6 +615,28 @@ const durationEl = document.getElementById("duration");
 let currentSong = null;
 let isScrubbing = false;
 
+/*
+  A song is considered "timed" only when every lyric timestamp
+  is strictly later than the one before it. This means the new
+  song safely stays in plain-lyrics mode while its times are all 0.
+*/
+function hasCompleteTiming(song) {
+  if (!song || song.lyrics.length < 2) return false;
+
+  for (let i = 1; i < song.lyrics.length; i++) {
+    const previous = Number(song.lyrics[i - 1][0]);
+    const current = Number(song.lyrics[i][0]);
+
+    if (!Number.isFinite(previous) ||
+        !Number.isFinite(current) ||
+        current <= previous) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function loadSong(songKey) {
   currentSong = songs[songKey];
 
@@ -523,7 +653,10 @@ function loadSong(songKey) {
   dedication.textContent = currentSong.dedication;
 
   lyricsBox.innerHTML = "";
-  lyricsBox.classList.toggle("untimed", !currentSong.timedLyrics);
+  lyricsBox.scrollTop = 0;
+
+  const timed = hasCompleteTiming(currentSong);
+  lyricsBox.classList.toggle("untimed", !timed);
 
   currentSong.lyrics.forEach(([_, text]) => {
     const d = document.createElement("div");
@@ -633,7 +766,7 @@ audio.ontimeupdate = () => {
     thumb.style.left = pct * 100 + "%";
   }
 
-  if (!currentSong.lyrics.length || !currentSong.timedLyrics) {
+  if (!hasCompleteTiming(currentSong)) {
     return;
   }
 
